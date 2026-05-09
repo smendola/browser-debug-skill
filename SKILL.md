@@ -32,6 +32,46 @@ The `--user-data-dir` flag is **required** when Chrome is already running. Chrom
 refuses to open a second instance on the debug port unless it uses a separate
 profile directory.
 
+### Helper scripts (recommended)
+
+Two convenience scripts handle killing any running Chrome, optionally cloning a
+real profile, launching with CDP on port 9222, and verifying the connection:
+
+- **`scripts/chrome-cdp.sh`** — Linux / macOS (bash)
+- **`scripts/chrome-cdp.ps1`** — Windows (PowerShell)
+
+**Why clone your real profile?** A blank debug profile has no login sessions,
+cookies, or extensions. Cloning copies Bookmarks, History, Cookies, Preferences,
+Local Storage, Extensions, and Local State — so the debug session behaves like
+your normal browser. The agent or the user can run the clone step before
+starting a debug session.
+
+```bash
+# Linux/macOS — clone the "Default" profile then launch
+bash scripts/chrome-cdp.sh --clone Default
+
+# Windows — same, PowerShell
+pwsh scripts/chrome-cdp.ps1 -Clone Default
+```
+
+Other flags:
+
+| Flag | Effect |
+|---|---|
+| _(none)_ | Launch with whatever is already in `~/.chrome-debug-profile` |
+| `--clone <ProfileName>` / `-Clone` | Wipe debug dir, copy named profile, then launch |
+| `--reset` / `-Reset` | Wipe debug dir (fresh profile), then launch |
+
+The profile name matches a subdirectory of your Chrome user-data dir
+(`~/.config/google-chrome/` on Linux, `%LOCALAPPDATA%\Google\Chrome\User Data\`
+on Windows). Common names: `Default`, `Profile 1`, `Profile 2`.
+
+---
+
+### Manual invocation
+
+If you prefer to launch Chrome yourself (or are using Chromium / Edge / Brave):
+
 **Linux (Chrome):**
 ```bash
 google-chrome --remote-debugging-port=9222 \
